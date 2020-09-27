@@ -30,7 +30,7 @@ $_TEAMS['D3']['Name'] = "SG OSC-Schöneberg-Friedenau 3. Frauen";
 $team = "D3";
 
 
-$config = array("unique_id" => "st-werkstatt.de", "TZID" => "Europe/Berlin", "filename" => trim($_TEAMS[$team]['Name'])."-full.ics", "name" => $_TEAMS[$team]['Name'], "description" => $_TEAMS[$team]['League']);
+$config = array("unique_id" => "st-werkstatt.de", "TZID" => "Europe/Berlin", "filename" => trim($_TEAMS[$team]['Name'])."-full.ics");
 $vcalendar = new vcalendar($config);
 $vcalendar->setProperty("X-WR-TIMEZONE", "Europe/Berlin" );
 
