@@ -92,16 +92,18 @@ class vcalendar extends iCalBase {
  */
   function vcalendar ( $config = array()) {
     $this->_makeVersion();
-    $this->calscale   = null;
-    $this->method     = null;
+    $this->calscale	= null;
+    $this->method	= null;
     $this->_makeUnique_id();
-    $this->prodid     = null;
-    $this->xprop      = array();
-    $this->language   = null;
-    $this->directory  = '.';
-    $this->filename   = null;
-    $this->url        = null;
-    $this->dtzid      = null;
+    $this->prodid	= null;
+    $this->name		= null;
+    $this->description	= null;
+    $this->xprop	= array();
+    $this->language	= null;
+    $this->directory	= '.';
+    $this->filename	= null;
+    $this->url		= null;
+    $this->dtzid	= null;
 /**
  *   language = <Text identifying a language, as defined in [RFC 1766]>
  */
@@ -203,6 +205,53 @@ class vcalendar extends iCalBase {
     $this->method = $value;
     return TRUE;
   }
+
+/*********************************************************************************/
+/**
+ * Property Name: NAME
+ *
+ */
+/**
+ * creates formatted output for calendar property name
+ *
+ */
+  function createName() {
+    if( !isset( $this->name ))
+      $this->name = "";
+    switch( $this->format ) {
+      case 'xcal':
+        return $this->nl.' prodid="'.$this->name.'"';
+        break;
+      default:
+        return $this->_createElement( 'X-WR-CALNAME', '', $this->name );
+        break;
+    }
+  }
+/*********************************************************************************/
+
+/*********************************************************************************/
+/**
+ * Property Name: DESCRIPTION
+ *
+ */
+/**
+ * creates formatted output for calendar property description
+ *
+ */
+  function createDescription() {
+    if( !isset( $this->description ))
+      $this->name = "";
+    switch( $this->format ) {
+      case 'xcal':
+        return $this->nl.' prodid="'.$this->description.'"';
+        break;
+      default:
+        return $this->_createElement( 'X-WR-CALDESC', '', $this->description );
+        break;
+    }
+  }
+/*********************************************************************************/
+
 /*********************************************************************************/
 /**
  * Property Name: PRODID
@@ -665,6 +714,12 @@ class vcalendar extends iCalBase {
       case 'UNIQUE_ID':
         return $this->unique_id;
         break;
+      case 'NAME':
+        return $this->name;
+        break;
+      case 'DESCRIPTION':
+        return $this->description;
+        break;
       case 'URL':
         if( !empty( $this->url ))
           return $this->url;
@@ -808,6 +863,18 @@ class vcalendar extends iCalBase {
         $this->unique_id = $value;
         $this->_makeProdid();
         $subcfg  = array( 'UNIQUE_ID' => $value );
+        $res = TRUE;
+        break;
+      case 'NAME':
+        $this->name = $value;
+        $this->_makeProdid();
+        $subcfg  = array( 'NAME' => $value );
+        $res = TRUE;
+        break;
+      case 'DESCRIPTION':
+        $this->description = $value;
+        $this->_makeProdid();
+        $subcfg  = array( 'DESCRIPTION' => $value );
         $res = TRUE;
         break;
       case 'URL':
@@ -1965,6 +2032,9 @@ class vcalendar extends iCalBase {
     }
     $calendarStart .= $this->createVersion();
     $calendarStart .= $this->createProdid();
+    $calendarStart .= $this->createName();
+    $calendarStart .= $this->createDescription();
+
     $calendarStart .= $this->createCalscale();
     $calendarStart .= $this->createMethod();
     if( 'xcal' == $this->format )
