@@ -8,10 +8,17 @@ function dprint_r($var) {
 }
 
 function getGym($id) {
-    $gymURL = "http://bremerhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=HVN&location=";
+//    var_dump($id); 
+//    $gymURL = "https://hvberlin-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/locationSearch?federation=HVBerlin&location=";
+//    $gymURL = "https://hvberlin-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=HVBerlin&location=";
+    $gymURL = "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&location=";
+//    var_dump($gymURL.$id); 
     $gym = file_get_contents($gymURL.$id);
+//    var_dump($gym); 
     $gym = explode("<div", $gym);
-    $gym = explode("Hallenspielplan", $gym[22]);
+//    var_dump($gym); 
+    $gym = explode("Hallenspielplan", $gym[17]);
+//    var_dump($gym); 
     $gym[0] = trim(strip_tags(str_replace("id=\"content-col1\">", "", $gym[0])));
     $gym[1] = explode("<p>", $gym[1]);
     $gym[1] = explode("<br />", $gym[1][1]);
@@ -21,28 +28,45 @@ function getGym($id) {
     return $gym;
 }
 
-$URL = "http://bremerhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/teamPortrait?teamtable=";
+// $URL = "https://hvberlin-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/teamPortrait?teamtable=";
+$URL = "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/teamPortrait?teamtable=";
 
-$_TEAMS['H1']['ID'] = 1489308;
-$_TEAMS['H1']['League'] = "Landesklasse Männer KRAGE";
-$_TEAMS['H2']['ID'] = 1489439;
-$_TEAMS['H2']['League'] = "Regionsliga Männer West";
-$_TEAMS['H3']['ID'] = 1496183;
-$_TEAMS['H3']['League'] = "Regionsliga Männer West";
-$_TEAMS['D1']['ID'] = 1489417;
-$_TEAMS['D1']['League'] = "Regionsoberliga Frauen";
+$_TEAMS['D3']['ID'] = 1733117;
+$_TEAMS['D3']['League'] = "Stadtliga Frauen - Staffel A";
+$_TEAMS['D3']['Name'] = "SG OSC-Schöneberg-Friedenau 3. Frauen";
+$_TEAMS['WB']['ID'] = 1727523;
+$_TEAMS['WB']['League'] = "ÜBOL wB-Jgd. Südwest";
+$_TEAMS['WB']['Name'] = "SV Pullach 1. weibl. B-Jugend";
+$_TEAMS['WC']['ID'] = 1720887;
+$_TEAMS['WC']['League'] = "Landesliga weibliche C Jugend Staffel Süd";
+$_TEAMS['WC']['Name'] = "SV Pullach 1. weibl. C-Jugend ";
+$_TEAMS['H1']['ID'] = 1705301;
+$_TEAMS['H1']['League'] = "Bezirksoberliga Männer";
+$_TEAMS['H1']['Name'] = "SV Pullach 1. Männer";
+$_TEAMS['H2']['ID'] = 1706190;
+$_TEAMS['H2']['League'] = "Bezirksklasse Männer Staffel Ost";
+$_TEAMS['H2']['Name'] = "SV Pullach 2. Männer";
 
-$team = "H2";
+$team = "AH";
 
-$config = array("unique_id" => "atsbexhoevede.de", "TZID" => "Europe/Berlin", "filename" => $team."-full.ics");
+//   error_reporting(E_ALL);
+//   ini_set('display_errors', '1');
+
+$config = array("unique_id" => "st-werkstatt.de", "TZID" => "Europe/Berlin", "filename" => trim($_TEAMS[$team]['Name'])."-full.ics", "name" => $_TEAMS[$team]['Name'], "description" => $_TEAMS[$team]['League']);
 $vcalendar = new vcalendar($config);
 $vcalendar->setProperty("X-WR-TIMEZONE", "Europe/Berlin" );
 
 $games = file_get_contents($URL.$_TEAMS[$team]['ID']);
 $games = explode("<div", $games);
-$games = explode("<tr>", $games[22]);
 
-for($i=2; $i<count($games); $i++) {
+//    var_dump($games); 
+
+$games = explode("<tr>", $games[17]);
+
+//    var_dump($games); 
+
+  for($i=2; $i<count($games); $i++) {
+//for($i=2; $i<4; $i++) {
 	$games[$i] = trim($games[$i]);
     $games[$i] = str_replace(" nowrap=\"nowrap\"", "", $games[$i]);
 	$games[$i] = trim($games[$i]);
@@ -51,10 +75,16 @@ for($i=2; $i<count($games); $i++) {
     $games[$i] = explode("<td>", $games[$i]);
 	$games[$i][3] = str_replace("t", "", $games[$i][3]);
 
+
+//   var_dump($games[$i]); 
+
     for($j=0; $j<count($games[$i]); $j++) {
 		if($j==4) {
+//   var_dump($games[$i][4]); 
 			$games[$i][$j] = explode("\"", $games[$i][$j]);
+//   var_dump($games[$i][4]); 
 			$games[$i][$j] = explode("location=", $games[$i][$j][5]);
+//   var_dump($games[$i][4]); 
 			$games[$i][$j] = getGym($games[$i][$j][1]);
 		}
 		else {
